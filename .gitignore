@@ -1,0 +1,22 @@
+# Secrets / credentials
+sql_connection_string.txt
+*.env
+.env.*
+
+# Python virtual environments
+.venv/
+.venv-1/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# PowerPoint (excluded from repo)
+*.pptx
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
