@@ -19,12 +19,18 @@ library(scales)
 library(cluster)
 library(factoextra)
 
-SQL_SERVER   <- "building-permits-srv.database.windows.net"
-SQL_DATABASE <- "BuildingPermitsDW"
-SQL_USERNAME <- "CloudSA2156e73b"
-SQL_PASSWORD <- ""
+# Set these as environment variables — never commit real credentials.
+#   AZURE_SQL_SERVER, AZURE_SQL_DATABASE, AZURE_SQL_USERNAME, AZURE_SQL_PASSWORD
+SQL_SERVER   <- Sys.getenv("AZURE_SQL_SERVER", unset = "YOUR_SERVER.database.windows.net")
+SQL_DATABASE <- Sys.getenv("AZURE_SQL_DATABASE", unset = "BuildingPermitsDW")
+SQL_USERNAME <- Sys.getenv("AZURE_SQL_USERNAME", unset = "YOUR_USERNAME")
+SQL_PASSWORD <- Sys.getenv("AZURE_SQL_PASSWORD")
 
-OUTPUT_DIR <- "C:/Users/schanda/OneDrive - City of Winnipeg/projects/DWH Project 2026/R_outputs"
+if (!nzchar(SQL_PASSWORD)) {
+  stop("AZURE_SQL_PASSWORD is not set. Set Azure SQL credentials as environment variables before running.")
+}
+
+OUTPUT_DIR <- "R_outputs"
 dir.create(OUTPUT_DIR, showWarnings = FALSE)
 
 

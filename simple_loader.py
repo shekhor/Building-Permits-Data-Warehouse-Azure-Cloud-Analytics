@@ -3,15 +3,37 @@ Simple Data Loader for Building Permits Data Warehouse
 Loads data in small batches with reconnection logic to handle network timeouts
 """
 
+import os
 import pyodbc
 import pandas as pd
 from datetime import datetime
 import time
 
-CONNECTION_STRING = 'DRIVER={ODBC Driver 18 for SQL Server};SERVER=building-permits-srv.database.windows.net,1433;DATABASE=BuildingPermitsDW;UID=CloudSA2156e73b;PWD=Sqlserver1234!;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;'
+# Set these as environment variables — never commit real credentials.
+#   AZURE_SQL_SERVER, AZURE_SQL_DATABASE, AZURE_SQL_USERNAME, AZURE_SQL_PASSWORD
+SQL_SERVER = os.environ.get("AZURE_SQL_SERVER", "YOUR_SERVER.database.windows.net")
+SQL_DATABASE = os.environ.get("AZURE_SQL_DATABASE", "BuildingPermitsDW")
+SQL_USERNAME = os.environ.get("AZURE_SQL_USERNAME", "YOUR_USERNAME")
+SQL_PASSWORD = os.environ.get("AZURE_SQL_PASSWORD", "")
+
+CONNECTION_STRING = (
+    f"DRIVER={{ODBC Driver 18 for SQL Server}};"
+    f"SERVER={SQL_SERVER},1433;"
+    f"DATABASE={SQL_DATABASE};"
+    f"UID={SQL_USERNAME};"
+    f"PWD={SQL_PASSWORD};"
+    f"Encrypt=yes;"
+    f"TrustServerCertificate=no;"
+    f"Connection Timeout=30;"
+)
 
 def get_connection(max_retries=3):
     """Get database connection with retry logic"""
+    if not SQL_PASSWORD:
+        raise ValueError(
+            "AZURE_SQL_PASSWORD is not set. "
+            "Set Azure SQL credentials as environment variables before running."
+        )
     for attempt in range(max_retries):
         try:
             conn = pyodbc.connect(CONNECTION_STRING)

@@ -15,19 +15,21 @@ Source:
     Detailed-Building-Permit-Data/it4w-cpf4
 """
 
+import os
 import pandas as pd
 import numpy as np
 from datetime import datetime
 import pyodbc
 
 # It should be path from Azure Data Lake Gen2, but for Python compatibility, we are using local CSV copy.
-CSV_FILE_PATH = "C:\\Users\\schanda\\OneDrive - City of Winnipeg\\projects\\DWH Project 2026\\data\\building_permits.csv"
+CSV_FILE_PATH = os.path.join("data", "building_permits.csv")
 
-# Azure SQL Database
-SQL_SERVER   = "building-permits-srv.database.windows.net"
-SQL_DATABASE = "BuildingPermitsDW"
-SQL_USERNAME = "CloudSA2156e73b"
-SQL_PASSWORD = "" #Removed the password for security reasons. Please add your password here before running the script.
+# Set these as environment variables — never commit real credentials.
+#   AZURE_SQL_SERVER, AZURE_SQL_DATABASE, AZURE_SQL_USERNAME, AZURE_SQL_PASSWORD
+SQL_SERVER = os.environ.get("AZURE_SQL_SERVER", "YOUR_SERVER.database.windows.net")
+SQL_DATABASE = os.environ.get("AZURE_SQL_DATABASE", "BuildingPermitsDW")
+SQL_USERNAME = os.environ.get("AZURE_SQL_USERNAME", "YOUR_USERNAME")
+SQL_PASSWORD = os.environ.get("AZURE_SQL_PASSWORD", "")
 
 CONNECTION_STRING = (
     f"DRIVER={{ODBC Driver 18 for SQL Server}};"
@@ -462,6 +464,12 @@ def load_all(tables: dict) -> None:
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
+    if not SQL_PASSWORD:
+        raise SystemExit(
+            "AZURE_SQL_PASSWORD is not set. "
+            "Set Azure SQL credentials as environment variables before running."
+        )
+
     start = datetime.now()
     print(f"\n ETL Pipeline Started: {start.strftime('%Y-%m-%d %H:%M:%S')}")
 
